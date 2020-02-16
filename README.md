@@ -21,3 +21,7 @@ This will load the geometries as GeoJSON in a text column.
 If you have SpatiaLite available you can load them as SpatiaLite geometries like this:
 
     $ shapefile-to-sqlite my.db features.shp --spatialite
+
+The data will be loaded into a table called `features` - based on the name of the shapefile. You can specify an alternative table name using `--table`:
+
+    $ shapefile-to-sqlite my.db features.shp --table=places
