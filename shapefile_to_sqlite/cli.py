@@ -1,5 +1,6 @@
 import click
 from pathlib import Path
+from pyproj import CRS
 from . import utils
 
 # Have to import these two in this specific order or OS X might segmentation fault!
@@ -33,11 +34,14 @@ def cli(db_path, table, shapefile, alter, spatialite, spatialite_mod):
         if str(filepath).endswith(".zip"):
             openpath = "zip://{}".format(openpath)
         with fiona.open(openpath) as collection:
+            shapefile_crs = CRS.from_user_input(collection.crs)
+            print(openpath)
             with click.progressbar(collection) as bar:
                 utils.import_features(
                     db_path,
                     table=table or Path(filepath).stem,
                     features=bar,
+                    shapefile_crs=shapefile_crs,
                     alter=alter,
                     spatialite=spatialite,
                     spatialite_mod=spatialite_mod,

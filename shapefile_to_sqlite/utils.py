@@ -1,5 +1,9 @@
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
+from shapely.ops import transform
 import fiona
+import pyproj
+from pyproj import CRS
+from functools import partial
 import sqlite_utils
 import itertools
 import os
@@ -13,6 +17,7 @@ SPATIALITE_PATHS = (
     "/usr/lib/x86_64-linux-gnu/mod_spatialite.so",
     "/usr/local/lib/mod_spatialite.dylib",
 )
+WGS_84 = CRS.from_epsg(4326)
 
 
 class SpatiaLiteError(Exception):
@@ -23,9 +28,13 @@ import json
 
 
 def import_features(
-    db_path, table, features, alter=False, spatialite=False, spatialite_mod=None,
+    db_path, table, features, shapefile_crs, target_crs=None, alter=False, spatialite=False, spatialite_mod=None,
 ):
     db = sqlite_utils.Database(db_path)
+    target_crs = WGS_84
+
+    # We need to convert from shapefile_crs to target_crs
+    project = partial(pyproj.transform, pyproj.Proj(shapefile_crs), pyproj.Proj(target_crs))
 
     def yield_features():
         for feature in features:
@@ -37,8 +46,12 @@ def import_features(
                 if key.lower() == "id":
                     properties["id_"] = properties.pop(key)
             feature.update(properties)
+            # Transform co-ordinates:
+            geometry = transform(project, shape(feature["geometry"]))
             if spatialite:
-                feature["geometry"] = shape(feature["geometry"]).wkt
+                feature["geometry"] = geometry.wkt
+            else:
+                feature["geometry"] = mapping(geometry)
             yield feature
 
     features_iter = yield_features()
