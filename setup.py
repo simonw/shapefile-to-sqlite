@@ -26,7 +26,7 @@ setup(
         [console_scripts]
         shapefile-to-sqlite=shapefile_to_sqlite.cli:cli
     """,
-    install_requires=["sqlite-utils>=2.2", "Shapely", "Fiona"],
+    install_requires=["sqlite-utils>=2.2", "Shapely", "Fiona", "pyproj"],
     extras_require={"test": ["pytest"]},
     tests_require=["shapefile-to-sqlite[test]"],
 )
