@@ -23,12 +23,7 @@ import json
 
 
 def import_features(
-    db_path,
-    table,
-    features,
-    alter=False,
-    spatialite=False,
-    spatialite_mod=None,
+    db_path, table, features, alter=False, spatialite=False, spatialite_mod=None,
 ):
     db = sqlite_utils.Database(db_path)
 
@@ -66,7 +61,9 @@ def import_features(
             ensure_table_has_geometry(db, table)
         conversions = {"geometry": "GeomFromText(?, 4326)"}
 
-    db[table].insert_all(features_iter, conversions=conversions, alter=alter, pk="id", replace=True)
+    db[table].insert_all(
+        features_iter, conversions=conversions, alter=alter, pk="id", replace=True
+    )
     return db[table]
 
 
