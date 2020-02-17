@@ -2,7 +2,7 @@ from shapely.geometry import shape, mapping
 from shapely.ops import transform
 import fiona
 import pyproj
-from pyproj import CRS
+from pyproj import CRS, Transformer
 from functools import partial
 import sqlite_utils
 import itertools
@@ -28,13 +28,24 @@ import json
 
 
 def import_features(
-    db_path, table, features, shapefile_crs, target_crs=None, alter=False, spatialite=False, spatialite_mod=None,
+    db_path,
+    table,
+    features,
+    shapefile_crs,
+    target_crs=None,
+    alter=False,
+    spatialite=False,
+    spatialite_mod=None,
 ):
     db = sqlite_utils.Database(db_path)
     target_crs = WGS_84
 
     # We need to convert from shapefile_crs to target_crs
-    project = partial(pyproj.transform, pyproj.Proj(shapefile_crs), pyproj.Proj(target_crs))
+    transformer = None
+    if shapefile_crs:
+        transformer = Transformer.from_crs(
+            shapefile_crs, target_crs, always_xy=True, skip_equivalent=True
+        )
 
     def yield_features():
         for feature in features:
@@ -47,7 +58,11 @@ def import_features(
                     properties["id_"] = properties.pop(key)
             feature.update(properties)
             # Transform co-ordinates:
-            geometry = transform(project, shape(feature["geometry"]))
+            geometry = feature["geometry"]
+            if transformer:
+                geometry = transform(transformer.transform, shape(geometry))
+            else:
+                geometry = shape(geometry)
             if spatialite:
                 feature["geometry"] = geometry.wkt
             else:

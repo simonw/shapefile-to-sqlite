@@ -11,7 +11,9 @@ testdir = pathlib.Path(__file__).parent
 
 def test_missing(tmpdir):
     db_path = str(tmpdir / "output.db")
-    result = CliRunner().invoke(cli.cli, [db_path, str(testdir / "missing.shp")])
+    result = CliRunner().invoke(
+        cli.cli, [db_path, str(testdir / "missing.shp")], catch_exceptions=False
+    )
     assert 2 == result.exit_code
     assert "does not exist" in result.stdout.strip()
 
@@ -24,7 +26,7 @@ def test_import_features(tmpdir, table):
     if table:
         expected_table = table
         args.extend(("--table", table))
-    result = CliRunner().invoke(cli.cli, args)
+    result = CliRunner().invoke(cli.cli, args, catch_exceptions=False)
     assert 0 == result.exit_code, result.stdout
     db = sqlite_utils.Database(db_path)
     assert [expected_table] == db.table_names()

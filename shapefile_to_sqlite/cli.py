@@ -34,7 +34,7 @@ def cli(db_path, table, shapefile, alter, spatialite, spatialite_mod):
         if str(filepath).endswith(".zip"):
             openpath = "zip://{}".format(openpath)
         with fiona.open(openpath) as collection:
-            shapefile_crs = CRS.from_user_input(collection.crs)
+            shapefile_crs = CRS.from_wkt(collection.crs_wkt) if collection.crs else None
             print(openpath)
             with click.progressbar(collection) as bar:
                 utils.import_features(
