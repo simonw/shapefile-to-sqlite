@@ -74,5 +74,5 @@ def test_import_features_spatialite(tmpdir):
         },
     ]
 
-    assert ["rowid"] == db["features"].pks
+    assert ["id"] == db["features"].pks
     assert expected_rows == rows

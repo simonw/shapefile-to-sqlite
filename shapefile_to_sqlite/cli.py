@@ -20,14 +20,13 @@ import fiona
     nargs=-1,
 )
 @click.option("--table", help="Table to load data into")
-@click.option("--pk", help="Column to use as a primary key")
 @click.option("--alter", is_flag=True, help="Add any missing columns")
 @click.option("--spatialite", is_flag=True, help="Use SpatiaLite")
 @click.option(
     "--spatialite_mod",
     help="Path to SpatiaLite module, for if --spatialite cannot find it automatically",
 )
-def cli(db_path, table, shapefile, pk, alter, spatialite, spatialite_mod):
+def cli(db_path, table, shapefile, alter, spatialite, spatialite_mod):
     "Load shapefiles into a SQLite (optionally SpatiaLite) database"
     for filepath in shapefile:
         openpath = filepath
@@ -39,7 +38,6 @@ def cli(db_path, table, shapefile, pk, alter, spatialite, spatialite_mod):
                     db_path,
                     table=table or Path(filepath).stem,
                     features=bar,
-                    pk=pk,
                     alter=alter,
                     spatialite=spatialite,
                     spatialite_mod=spatialite_mod,

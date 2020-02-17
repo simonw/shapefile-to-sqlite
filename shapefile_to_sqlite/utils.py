@@ -26,7 +26,6 @@ def import_features(
     db_path,
     table,
     features,
-    pk=None,
     alter=False,
     spatialite=False,
     spatialite_mod=None,
@@ -63,14 +62,11 @@ def import_features(
             features_iter = itertools.chain(first_100, features_iter)
             column_types = sqlite_utils.suggest_column_types(first_100)
             column_types.pop("geometry")
-            db[table].create(column_types, pk=pk)
+            db[table].create(column_types, pk="id")
             ensure_table_has_geometry(db, table)
         conversions = {"geometry": "GeomFromText(?, 4326)"}
 
-    if pk:
-        db[table].upsert_all(features_iter, conversions=conversions, pk=pk, alter=alter)
-    else:
-        db[table].insert_all(features_iter, conversions=conversions, alter=alter)
+    db[table].insert_all(features_iter, conversions=conversions, alter=alter, pk="id", replace=True)
     return db[table]
 
 
