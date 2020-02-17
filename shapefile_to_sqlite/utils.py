@@ -38,13 +38,14 @@ def import_features(
     spatialite_mod=None,
 ):
     db = sqlite_utils.Database(db_path)
-    target_crs = WGS_84
-
     # We need to convert from shapefile_crs to target_crs
     transformer = None
-    if shapefile_crs:
+    if shapefile_crs and target_crs:
         transformer = Transformer.from_crs(
-            shapefile_crs, target_crs, always_xy=True, skip_equivalent=True
+            crs_from=shapefile_crs,
+            crs_to=target_crs,
+            always_xy=True,
+            skip_equivalent=True,
         )
 
     def yield_features():
