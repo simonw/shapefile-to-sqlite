@@ -35,8 +35,14 @@ def import_features(
 
     def yield_features():
         for feature in features:
+            if isinstance(feature["id"], str) and feature["id"].isdigit():
+                feature["id"] = int(feature["id"])
             feature.pop("type")
-            feature.update(feature.pop("properties") or {})
+            properties = feature.pop("properties") or {}
+            for key in list(properties.keys()):
+                if key.lower() == "id":
+                    properties["id_"] = properties.pop(key)
+            feature.update(properties)
             if spatialite:
                 feature["geometry"] = shape(feature["geometry"]).wkt
             yield feature
