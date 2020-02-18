@@ -20,7 +20,7 @@ This will load the geometries as GeoJSON in a text column.
 
 ## Using with SpatiaLite
 
-If you have SpatiaLite available you can load them as SpatiaLite geometries like this:
+If you have [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/index) available you can load them as SpatiaLite geometries like this:
 
     $ shapefile-to-sqlite my.db features.shp --spatialite
 
