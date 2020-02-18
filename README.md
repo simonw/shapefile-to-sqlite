@@ -18,6 +18,8 @@ You can run this tool against a shapefile file like so:
 
 This will load the geometries as GeoJSON in a text column.
 
+## Using with SpatiaLite
+
 If you have SpatiaLite available you can load them as SpatiaLite geometries like this:
 
     $ shapefile-to-sqlite my.db features.shp --spatialite
