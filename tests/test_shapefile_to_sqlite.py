@@ -94,7 +94,6 @@ def test_import_features_spatialite_with_custom_crs(tmpdir):
         ],
         catch_exceptions=False,
     )
-    print(result.stdout)
     assert 0 == result.exit_code, result.stdout
     db = sqlite_utils.Database(db_path)
     utils.init_spatialite(db, utils.find_spatialite())
