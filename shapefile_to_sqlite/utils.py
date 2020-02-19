@@ -40,6 +40,10 @@ def import_features(
     db = sqlite_utils.Database(db_path)
     # We need to convert from shapefile_crs to target_crs
     transformer = None
+    table_srid = 4326
+    if target_crs and not shapefile_crs:
+        # Assume shapefile is in WGS 84
+        shapefile_crs = WGS_84
     if shapefile_crs and target_crs:
         transformer = Transformer.from_crs(
             crs_from=shapefile_crs,
@@ -47,6 +51,8 @@ def import_features(
             always_xy=True,
             skip_equivalent=True,
         )
+    if target_crs:
+        table_srid = target_crs.to_epsg()
 
     def yield_features():
         for feature in features:
@@ -87,8 +93,8 @@ def import_features(
             column_types = sqlite_utils.suggest_column_types(first_100)
             column_types.pop("geometry")
             db[table].create(column_types, pk="id")
-            ensure_table_has_geometry(db, table)
-        conversions = {"geometry": "GeomFromText(?, 4326)"}
+            ensure_table_has_geometry(db, table, table_srid)
+        conversions = {"geometry": "GeomFromText(?, {})".format(table_srid)}
 
     db[table].insert_all(
         features_iter, conversions=conversions, alter=alter, pk="id", replace=True
@@ -112,10 +118,11 @@ def init_spatialite(db, lib):
     db.conn.execute("select InitSpatialMetadata(1)")
 
 
-def ensure_table_has_geometry(db, table):
+def ensure_table_has_geometry(db, table, table_srid):
     if "geometry" not in db[table].columns_dict:
         db.conn.execute(
-            "SELECT AddGeometryColumn(?, 'geometry', 4326, 'GEOMETRY', 2);", [table]
+            "SELECT AddGeometryColumn(?, 'geometry', ?, 'GEOMETRY', 2);",
+            [table, table_srid],
         )
 
 

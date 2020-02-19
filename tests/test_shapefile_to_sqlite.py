@@ -75,6 +75,44 @@ def test_import_features_spatialite(tmpdir):
             "geometry": '{"type":"Polygon","coordinates":[[[-129.375,47.75409797968003],[-115.3125,50.73645513701067],[-100.8984375,50.06419173665909],[-84.375,51.39920565355377],[-61.52343749999999,44.33956524809713],[-77.34374999999998,25.48295117535531],[-85.4296875,24.20688962239802],[-96.6796875,25.48295117535531],[-119.53125,33.43144133557529],[-129.375,47.75409797968003]]]}',
         },
     ]
+    assert ["id"] == db["features"].pks
+    assert expected_rows == rows
 
+
+@pytest.mark.skipif(not utils.find_spatialite(), reason="Could not find SpatiaLite")
+def test_import_features_spatialite_with_custom_crs(tmpdir):
+    db_path = str(tmpdir / "output.db")
+    result = CliRunner().invoke(
+        cli.cli,
+        [
+            db_path,
+            str(testdir / "features.shp"),
+            "--spatialite",
+            "--crs",
+            "epsg:2227",
+            "-v",
+        ],
+        catch_exceptions=False,
+    )
+    print(result.stdout)
+    assert 0 == result.exit_code, result.stdout
+    db = sqlite_utils.Database(db_path)
+    utils.init_spatialite(db, utils.find_spatialite())
+    assert {"features", "spatial_ref_sys"}.issubset(db.table_names())
+    rows = db.execute_returning_dicts(
+        "select slug, srid(geometry), AsGeoJSON(geometry) as geometry from features"
+    )
+    expected_rows = [
+        {
+            "slug": "uk",
+            "srid(geometry)": 2227,
+            "geometry": '{"type":"Polygon","coordinates":[[[23657775.32853747,22529666.28541567],[24556455.05763163,24135172.24177192],[27652738.70766846,24033449.61854204],[28150883.53219706,21343916.93640194],[26640920.79348303,19116447.67223906],[23657775.32853747,22529666.28541567]]]}',
+        },
+        {
+            "slug": "usa",
+            "srid(geometry)": 2227,
+            "geometry": '{"type":"Polygon","coordinates":[[[4346640.819945158,5865811.33053253],[7796046.518982057,6906735.031612804],[11246615.05156807,7113130.806141029],[14856355.43933342,8742646.756998315],[21088511.50955399,9236831.236157331],[20601665.850453,896152.8569381489],[18284784.27434483,-652093.4496258244],[14506308.7237259,-1383122.899243944],[6858031.882782473,523720.8423723599],[4346640.819945158,5865811.33053253]]]}',
+        },
+    ]
     assert ["id"] == db["features"].pks
     assert expected_rows == rows
