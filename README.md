@@ -6,6 +6,8 @@
 
 Load shapefiles into a SQLite (optionally SpatiaLite) database.
 
+Project background: [Things I learned about shapefiles building shapefile-to-sqlite](https://simonwillison.net/2020/Feb/19/shapefile-to-sqlite/)
+
 ## How to install
 
     $ pip install shapefile-to-sqlite
