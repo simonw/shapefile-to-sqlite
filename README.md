@@ -37,3 +37,13 @@ If you have installed the module in another location, you can use the `--spatial
 
     $ shapefile-to-sqlite my.db features.shp \
         --spatialite_mod=/usr/lib/mod_spatialite.dylib
+
+## Projections
+
+By default, this tool will attempt to convert geometries in the shapefile to the WGS 84 projection, for best conformance with the [GeoJSON specification](https://tools.ietf.org/html/rfc7946).
+
+If you want it to leave the data in whatever projection was used by the shapefile, use the `--crs=keep` option.
+
+You can convert the data to another output projection by passing it to the `--crs` option. For example, to convert to [EPSG:2227](https://epsg.io/2227) (California zone 3) use `--crs=espg:2227`.
+
+The full list of formats accepted by the `--crs` option is [documented here](https://pyproj4.github.io/pyproj/stable/api/crs.html#pyproj.crs.CRS.__init__).
