@@ -1,7 +1,9 @@
 from click.testing import CliRunner
 from shapefile_to_sqlite import cli, utils
 import pytest
+from pytest import approx
 import sqlite_utils
+import json
 import pathlib
 import pytest
 
@@ -101,16 +103,46 @@ def test_import_features_spatialite_with_custom_crs(tmpdir):
     rows = db.execute_returning_dicts(
         "select slug, srid(geometry), AsGeoJSON(geometry) as geometry from features"
     )
+    for row in rows:
+        row["geometry"] = json.loads(row["geometry"])
     expected_rows = [
         {
             "slug": "uk",
             "srid(geometry)": 2227,
-            "geometry": '{"type":"Polygon","coordinates":[[[23657775.32853747,22529666.28541567],[24556455.05763163,24135172.24177192],[27652738.70766846,24033449.61854204],[28150883.53219706,21343916.93640194],[26640920.79348303,19116447.67223906],[23657775.32853747,22529666.28541567]]]}',
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [approx(23657775.32853747), approx(22529666.28541567)],
+                        [approx(24556455.05763163), approx(24135172.24177192)],
+                        [approx(27652738.70766846), approx(24033449.61854204)],
+                        [approx(28150883.53219706), approx(21343916.93640194)],
+                        [approx(26640920.79348303), approx(19116447.67223906)],
+                        [approx(23657775.32853747), approx(22529666.28541567)],
+                    ]
+                ],
+            },
         },
         {
             "slug": "usa",
             "srid(geometry)": 2227,
-            "geometry": '{"type":"Polygon","coordinates":[[[4346640.819945158,5865811.33053253],[7796046.518982057,6906735.031612804],[11246615.05156807,7113130.806141029],[14856355.43933342,8742646.756998315],[21088511.50955399,9236831.236157331],[20601665.850453,896152.8569381489],[18284784.27434483,-652093.4496258244],[14506308.7237259,-1383122.899243944],[6858031.882782473,523720.8423723599],[4346640.819945158,5865811.33053253]]]}',
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [approx(4346640.819945158), approx(5865811.33053253)],
+                        [approx(7796046.518982057), approx(6906735.031612804)],
+                        [approx(11246615.05156807), approx(7113130.806141029)],
+                        [approx(14856355.43933342), approx(8742646.756998315)],
+                        [approx(21088511.50955399), approx(9236831.236157331)],
+                        [approx(20601665.850453), approx(896152.8569381489)],
+                        [approx(18284784.27434483), approx(-652093.4496258244)],
+                        [approx(14506308.7237259), approx(-1383122.899243944)],
+                        [approx(6858031.882782473), approx(523720.8423723599)],
+                        [approx(4346640.819945158), approx(5865811.33053253)],
+                    ]
+                ],
+            },
         },
     ]
     assert ["id"] == db["features"].pks
