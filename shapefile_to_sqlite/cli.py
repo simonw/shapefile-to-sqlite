@@ -49,6 +49,7 @@ def validate_crs(ctx, param, value):
 )
 @click.option("--alter", is_flag=True, help="Add any missing columns")
 @click.option("--spatialite", is_flag=True, help="Use SpatiaLite")
+@click.option("--spatial-index", is_flag=True, help="Create spatial indexes")
 @click.option(
     "--spatialite_mod",
     help="Path to SpatiaLite module, for if --spatialite cannot find it automatically",
@@ -59,7 +60,17 @@ def validate_crs(ctx, param, value):
     help="Show extra information, including the CRS details",
     is_flag=True,
 )
-def cli(db_path, shapefile, table, crs, alter, spatialite, spatialite_mod, verbose):
+def cli(
+    db_path,
+    shapefile,
+    table,
+    crs,
+    alter,
+    spatialite,
+    spatial_index,
+    spatialite_mod,
+    verbose,
+):
     "Load shapefiles into a SQLite (optionally SpatiaLite) database"
     if verbose and crs:
         print("Output CRS: {}".format(crs))
@@ -93,6 +104,7 @@ def cli(db_path, shapefile, table, crs, alter, spatialite, spatialite_mod, verbo
                     alter=alter,
                     spatialite=spatialite,
                     spatialite_mod=spatialite_mod,
+                    spatial_index=spatial_index,
                 )
                 num_added = db_table.count
                 if verbose:

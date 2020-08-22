@@ -28,7 +28,7 @@ If you have [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/index) ava
 
 The data will be loaded into a table called `features` - based on the name of the shapefile. You can specify an alternative table name using `--table`:
 
-    $ shapefile-to-sqlite my.db features.shp --table=places
+    $ shapefile-to-sqlite my.db features.shp --table=places --spatialite
 
 The tool will search for the SpatiaLite module in the following locations:
 
@@ -39,6 +39,12 @@ If you have installed the module in another location, you can use the `--spatial
 
     $ shapefile-to-sqlite my.db features.shp \
         --spatialite_mod=/usr/lib/mod_spatialite.dylib
+
+You can use the `--spatial-index` option to create a spatial index on the `geometry` column:
+
+    $ shapefile-to-sqlite my.db features.shp --spatial-index
+
+You can omit `--spatialite` if you use either `--spatialite-mod` or `--spatial-index`.
 
 ## Projections
 
