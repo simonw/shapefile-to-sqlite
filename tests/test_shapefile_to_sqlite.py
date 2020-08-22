@@ -147,3 +147,17 @@ def test_import_features_spatialite_with_custom_crs(tmpdir):
     ]
     assert ["id"] == db["features"].pks
     assert expected_rows == rows
+
+
+@pytest.mark.skipif(not utils.find_spatialite(), reason="Could not find SpatiaLite")
+def test_import_features_spatial_index(tmpdir):
+    db_path = str(tmpdir / "output.db")
+    result = CliRunner().invoke(
+        cli.cli,
+        [db_path, str(testdir / "features.shp"), "--spatialite", "--spatial-index"],
+        catch_exceptions=False,
+    )
+    assert 0 == result.exit_code, result.stdout
+    db = sqlite_utils.Database(db_path)
+    utils.init_spatialite(db, utils.find_spatialite())
+    assert "idx_features_geometry" in db.table_names()

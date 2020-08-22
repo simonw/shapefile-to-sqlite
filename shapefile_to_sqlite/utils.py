@@ -36,6 +36,7 @@ def import_features(
     alter=False,
     spatialite=False,
     spatialite_mod=None,
+    spatial_index=False,
 ):
     db = sqlite_utils.Database(db_path)
     # We need to convert from shapefile_crs to target_crs
@@ -79,7 +80,7 @@ def import_features(
     features_iter = yield_features()
 
     conversions = {}
-    if spatialite_mod:
+    if spatialite_mod or spatial_index:
         spatialite = True
     if spatialite:
         lib = spatialite_mod or find_spatialite()
@@ -99,6 +100,10 @@ def import_features(
     db[table].insert_all(
         features_iter, conversions=conversions, alter=alter, pk="id", replace=True
     )
+
+    if spatial_index:
+        db.conn.execute("select CreateSpatialIndex(?, ?)", [table, "geometry"])
+
     return db[table]
 
 
