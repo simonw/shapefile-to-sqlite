@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/shapefile-to-sqlite.svg)](https://pypi.org/project/shapefile-to-sqlite/)
 [![CircleCI](https://circleci.com/gh/simonw/shapefile-to-sqlite.svg?style=svg)](https://circleci.com/gh/simonw/shapefile-to-sqlite)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/shapefile-to-sqlite/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/shapefile-to-sqlite/blob/main/LICENSE)
 
 Load shapefiles into a SQLite (optionally SpatiaLite) database.
 
