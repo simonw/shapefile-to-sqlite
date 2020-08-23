@@ -33,6 +33,7 @@ def test_import_features(tmpdir, table):
     db = sqlite_utils.Database(db_path)
     assert [expected_table] == db.table_names()
     rows = list(db[expected_table].rows)
+    assert db[expected_table].columns_dict["slug"] is str
     expected_rows = [
         {
             "id": 0,
@@ -172,8 +173,31 @@ def test_import_features_extract_columns(tmpdir):
     )
     assert 0 == result.exit_code, result.stdout
     db = sqlite_utils.Database(db_path)
-    assert set(db.table_names()) == {"slug", "features"}
+    assert_db_has_extracted_columns(db)
+
+
+@pytest.mark.skipif(not utils.find_spatialite(), reason="Could not find SpatiaLite")
+def test_import_features_extract_columns_spatialite(tmpdir):
+    db_path = str(tmpdir / "output.db")
+    result = CliRunner().invoke(
+        cli.cli,
+        [db_path, str(testdir / "features.shp"), "-c", "slug", "--spatialite"],
+        catch_exceptions=False,
+    )
+    assert 0 == result.exit_code, result.stdout
+    db = sqlite_utils.Database(db_path)
+    assert_db_has_extracted_columns(db)
+
+
+def assert_db_has_extracted_columns(db):
+    assert set(db.table_names()).issuperset({"slug", "features"})
     assert list(db["slug"].rows) == [
         {"id": 1, "value": "uk"},
         {"id": 2, "value": "usa"},
+    ]
+    assert db["features"].columns_dict["slug"] is int
+    assert db["features"].foreign_keys == [
+        sqlite_utils.db.ForeignKey(
+            table="features", column="slug", other_table="slug", other_column="id"
+        )
     ]

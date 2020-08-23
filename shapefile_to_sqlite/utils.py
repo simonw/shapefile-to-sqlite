@@ -93,6 +93,8 @@ def import_features(
             first_100 = list(itertools.islice(features_iter, 0, 100))
             features_iter = itertools.chain(first_100, features_iter)
             column_types = sqlite_utils.suggest_column_types(first_100)
+            for col in extract_columns or []:
+                column_types[col] = int
             column_types.pop("geometry")
             db[table].create(column_types, pk="id")
             ensure_table_has_geometry(db, table, table_srid)
@@ -106,6 +108,8 @@ def import_features(
         replace=True,
         extracts=extract_columns or [],
     )
+    # Add foreign keys
+    db.add_foreign_keys([(table, column, column, "id") for column in extract_columns])
 
     if spatial_index:
         db.conn.execute("select CreateSpatialIndex(?, ?)", [table, "geometry"])
