@@ -55,3 +55,13 @@ If you want it to leave the data in whatever projection was used by the shapefil
 You can convert the data to another output projection by passing it to the `--crs` option. For example, to convert to [EPSG:2227](https://epsg.io/2227) (California zone 3) use `--crs=espg:2227`.
 
 The full list of formats accepted by the `--crs` option is [documented here](https://pyproj4.github.io/pyproj/stable/api/crs.html#pyproj.crs.CRS.__init__).
+
+## Extracting columns
+
+If your data contains columns with a small number of heavily duplicated values - the names of specific agencies responsible for parcels of land for example - you can extract those columns into separate lookup tables referenced by foreign keys using the `-c` option:
+
+    $ shapefile-to-sqlite my.db features.shp -c agency
+
+This will create a `agency` table with `id` and `name` columns, and will create the `agency` column in your main table as an integer foreign key reference to that table.
+
+The `-c` option can be used multiple times.

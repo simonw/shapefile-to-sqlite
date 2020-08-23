@@ -34,6 +34,7 @@ def import_features(
     shapefile_crs,
     target_crs=None,
     alter=False,
+    extract_columns=None,
     spatialite=False,
     spatialite_mod=None,
     spatial_index=False,
@@ -98,7 +99,12 @@ def import_features(
         conversions = {"geometry": "GeomFromText(?, {})".format(table_srid)}
 
     db[table].insert_all(
-        features_iter, conversions=conversions, alter=alter, pk="id", replace=True
+        features_iter,
+        conversions=conversions,
+        alter=alter,
+        pk="id",
+        replace=True,
+        extracts=extract_columns or [],
     )
 
     if spatial_index:

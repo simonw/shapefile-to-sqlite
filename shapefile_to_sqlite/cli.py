@@ -48,6 +48,12 @@ def validate_crs(ctx, param, value):
     ),
 )
 @click.option("--alter", is_flag=True, help="Add any missing columns")
+@click.option(
+    "--extract-column",
+    "-c",
+    multiple=True,
+    help=("One or more columns to 'extract' into a separate lookup table. "),
+)
 @click.option("--spatialite", is_flag=True, help="Use SpatiaLite")
 @click.option("--spatial-index", is_flag=True, help="Create spatial indexes")
 @click.option(
@@ -66,6 +72,7 @@ def cli(
     table,
     crs,
     alter,
+    extract_column,
     spatialite,
     spatial_index,
     spatialite_mod,
@@ -102,6 +109,7 @@ def cli(
                     shapefile_crs=shapefile_crs,
                     target_crs=crs,
                     alter=alter,
+                    extract_columns=extract_column,
                     spatialite=spatialite,
                     spatialite_mod=spatialite_mod,
                     spatial_index=spatial_index,

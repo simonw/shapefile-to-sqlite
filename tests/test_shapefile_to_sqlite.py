@@ -161,3 +161,19 @@ def test_import_features_spatial_index(tmpdir):
     db = sqlite_utils.Database(db_path)
     utils.init_spatialite(db, utils.find_spatialite())
     assert "idx_features_geometry" in db.table_names()
+
+
+def test_import_features_extract_columns(tmpdir):
+    db_path = str(tmpdir / "output.db")
+    result = CliRunner().invoke(
+        cli.cli,
+        [db_path, str(testdir / "features.shp"), "-c", "slug"],
+        catch_exceptions=False,
+    )
+    assert 0 == result.exit_code, result.stdout
+    db = sqlite_utils.Database(db_path)
+    assert set(db.table_names()) == {"slug", "features"}
+    assert list(db["slug"].rows) == [
+        {"id": 1, "value": "uk"},
+        {"id": 2, "value": "usa"},
+    ]
