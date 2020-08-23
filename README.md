@@ -65,3 +65,5 @@ If your data contains columns with a small number of heavily duplicated values -
 This will create a `agency` table with `id` and `name` columns, and will create the `agency` column in your main table as an integer foreign key reference to that table.
 
 The `-c` option can be used multiple times.
+
+[CPAD_2020a_Units](https://calands.datasettes.com/calands/CPAD_2020a_Units) is an example of a table created using the `-c` option.
