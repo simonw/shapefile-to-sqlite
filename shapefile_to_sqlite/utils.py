@@ -51,7 +51,6 @@ def import_features(
             crs_from=shapefile_crs,
             crs_to=target_crs,
             always_xy=True,
-            skip_equivalent=True,
         )
     if target_crs:
         table_srid = target_crs.to_epsg()
